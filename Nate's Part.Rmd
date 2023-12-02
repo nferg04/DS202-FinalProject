@@ -1,0 +1,20 @@
+---
+title: "Nate's Part"
+author: "Nate Ferguson"
+date: "2023-12-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rvest)
+```
+
+```{r}
+file_path <- "All National Parks Visitation 1904-2016.csv"
+national_parks_data <- read.csv(file_path)
+head(national_parks_data)
+```
+
+
