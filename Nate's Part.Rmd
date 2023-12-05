@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
+library(dplyr)
 ```
 
 ```{r}
@@ -16,5 +17,34 @@ file_path <- "All National Parks Visitation 1904-2016.csv"
 national_parks_data <- read.csv(file_path)
 head(national_parks_data)
 ```
+```{r}
 
+ggplot(national_parks_data, aes(x = Year, fill = Unit.Type)) +
+  geom_bar()
+```
+```{r}
+firstYear <- national_parks_data %>%
+  filter(Unit.Type == "National Park") %>%
+  group_by(Unit.Name) %>%
+  filter(Year == min(Year))
+
+#firstYear$Visitors <- factor(firstYear$Visitors)
+
+ggplot(firstYear, aes(y = Visitors, x = YearRaw)) +
+  geom_point()
+
+```
+```{r}
+ParksCreatedPerYear <- firstYear %>%
+  group_by(YearRaw) %>%
+  summarise(Unique_Parks = n_distinct(Parkname))
+
+print(ParksCreatedPerYear)
+
+max_year <- ParksCreatedPerYear[which.max(ParksCreatedPerYear$Unique_Parks), ]
+```
+
+```{r}
+cat("The year with the most National Parks first visitor counts is", max_year$YearRaw, ".")
+```
 
