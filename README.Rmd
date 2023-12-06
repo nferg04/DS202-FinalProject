@@ -4,4 +4,36 @@ author: "Nate Ferguson, Sam McTeague, Evan Sivets, Steven Tran"
 date: "2023-12-02"
 output: html_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Final Report - Team National Parks
+
+##Introduction 
+For our research project, we decided to analyze data on United States National Parks. As a group, our main goal was to discover how certain variables relate to and affect the visitation of national parks. We performed a variety of analysis on the variables in our data set to investigate this goal, used an array of methods and tests to generate outputs and visualizations that are related to our research goal, and were able to make important conclusions based on these techniques. Everything mentioned above will be discussed throughout this report.
+
+#Data 
+For our project we used a data set titled "US National Parks Visitation 1904-2016." The data set comes from data.world.com (https://data.world/inform8n/us-national-parks-visitation-1904-2016-with-boundaries/workspace/file?filename=All+National+Parks+Visitation+1904-2016.csv) and it is a real world data set. This data set tracks real data on National Parks in the United States of America from the years 1904-2016. The set contains 21,560 observations and 18 variables. 
+
+The data set contains many variables, but the key variables are Year, Unit Name, Unit Type, Geometry, Region, State, and Visitors. Year marks the year of the specific row of data. Unit Name is the name of the unit in each row. Unit Type specifies the type of park, such as National Park, National Monument, National Military Park, etc. Geometry notes the geometry of the park, with the options being polygon or multipolygon. Region states the region that each park is located in, and there are eight different regions. State notes which US state each speciifc park is located in. Visitors records how many people visited each specific park in the given year. 
+
+We read in and cleaned our data set using the code below. This code removed blank values from our data set.
+```{r}
+library(tidyverse)
+file_path <- "All National Parks Visitation 1904-2016.csv"
+national_parks_data <- read.csv(file_path)
+
+cleaned_data <- na.omit(national_parks_data)
+
+head(cleaned_data)
+```
+
+####Methods 
+
+
+#####Results 
+
+
+######Conclusion
 
