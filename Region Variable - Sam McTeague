@@ -1,0 +1,99 @@
+---
+title: "Region and Visitation - Sam McTeague's part"
+author: "Sam McTeague"
+date: "2023-12-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+
+file_path <- "All National Parks Visitation 1904-2016.csv"
+national_parks_data <- read.csv(file_path)
+head(national_parks_data)
+nrow(national_parks_data)
+ncol(national_parks_data)
+```
+
+```{r}
+library(ggplot2)
+
+# Explore the structure of your dataset
+str(national_parks_data)
+
+# Basic summary statistics
+summary(national_parks_data)
+
+# Visualization: Barchart to compare visitation across regions
+ggplot(national_parks_data, aes(x = Region, y = Visitors, fill = Region)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Visitation across Regions",
+       x = "Region",
+       y = "Visitation",
+       fill = "Region")
+
+# Visualization: Line plot to show trends over the years for each region
+ggplot(national_parks_data, aes(x = Year, y = Visitors, color = Region)) +
+  geom_line() +
+  labs(title = "Visitation Trends Over Years",
+       x = "Year",
+       y = "Visitation",
+       color = "Region")
+
+# Statistical Analysis: ANOVA to test for significant differences in visitation between regions
+anova_model <- aov(Visitors ~ Region, data = national_parks_data)
+summary(anova_model)
+```
+
+```{r}
+# Calculate the number of unique parks for each region
+region_unique_parks <- national_parks_data %>%
+  group_by(Region) %>%
+  summarise(Unique_Parks = n_distinct(Parkname))
+
+# Print the resulting table
+print(region_unique_parks)
+```
+
+```{r}
+average_visitation <- aggregate(Visitors ~ Region, data = national_parks_data, FUN = mean)
+
+# Find the region with the lowest average visitors per year
+min_region <- average_visitation[which.min(average_visitation$Visitors), ]
+
+# Find the region with the highest average visitors per year
+max_region <- average_visitation[which.max(average_visitation$Visitors), ]
+
+# Print the results
+cat("Region with the lowest average visitors per year:", min_region$Region, "(", min_region$Visitors, ")\n")
+cat("Region with the highest average visitors per year:", max_region$Region, "(", max_region$Visitors, ")\n")
+```
+
+```{r}
+# Calculate average visitation and number of parks for each region
+region_summary <- national_parks_data %>%
+  group_by(Region) %>%
+  summarise(Avg_Visitation = mean(Visitors),
+            Number_of_Parks = n_distinct(Parkname))
+
+# Find the region with the highest and lowest average visitation based on the number of parks
+max_region <- region_summary %>%
+  arrange(desc(Avg_Visitation), Number_of_Parks) %>%
+  slice(1)
+
+min_region <- region_summary %>%
+  arrange(Avg_Visitation, Number_of_Parks) %>%
+  slice(1)
+
+# Print the resulting tables
+print("Region with the highest average visitation based on the number of parks:")
+print(max_region)
+
+print("Region with the lowest average visitation based on the number of parks:")
+print(min_region)
+```
