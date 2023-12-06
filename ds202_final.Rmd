@@ -1,0 +1,113 @@
+---
+title: "EvansPart"
+author: "Evan Sivets"
+output: html_document
+date: "2023-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rvest)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+file_path <- "All National Parks Visitation 1904-2016.csv"
+national_parks_data <- read.csv(file_path)
+head(national_parks_data)
+```
+
+
+```{r}
+# For summing up visitors by region
+visitors_by_region <- national_parks_data %>%
+  group_by(Region) %>%
+  summarise(total_visitors = sum(Visitors))
+
+# For summing up visitors by state
+visitors_by_state <- national_parks_data %>%
+  group_by(State) %>%
+  summarise(total_visitors = sum(Visitors))
+
+# Creating a bar plot for visitors by state
+ggplot(visitors_by_state, aes(x = State, y = total_visitors)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Total Visitors by State", x = "State", y = "Total Visitors") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip()  # Flip the axes for better readability
+```
+
+```{r}
+# Convert YearRaw to a factor for better visualization
+national_parks_data$YearRaw <- as.factor(national_parks_data$YearRaw)
+
+# Create a line plot for visitor trends over the years
+visitor_trends_plot <- ggplot(national_parks_data, aes(x = YearRaw, y = Visitors, group = State, color = State)) +
+  geom_line() +
+  labs(title = "Visitor Trends Over Years", x = "Year", y = "Number of Visitors") +
+  theme_minimal()
+
+# Display the plot
+print(visitor_trends_plot)
+```
+
+```{r}
+# Filter the data for required columns
+visitor_trends <- national_parks_data %>%
+  select(State, YearRaw, Visitors)
+
+# Convert YearRaw to a factor for better visualization
+visitor_trends$YearRaw <- as.factor(visitor_trends$YearRaw)
+
+# Create a line plot for visitor trends over the years by state
+ggplot(visitor_trends, aes(x = YearRaw, y = Visitors, color = State)) +
+  geom_line() +
+  labs(title = "Visitor Trends Over Years by State", x = "Year", y = "Number of Visitors") +
+  theme_minimal()
+```
+```{r}
+#PArk Type comparisons
+# Filter the necessary columns for park types and regions
+park_types <- national_parks_data %>%
+  select(Region, Unit.Type)
+
+# Count the occurrences of each park type within each region
+park_type_counts <- park_types %>%
+  group_by(Region, Unit.Type) %>%
+  summarise(count = n())
+
+# Create a bar plot for park type distribution across regions
+ggplot(park_type_counts, aes(x = Region, y = count, fill = Unit.Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Park Type Distribution Across Regions", x = "Region", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+```{r}
+#yearly trends in park establishments
+# Extract necessary columns for year and park names
+park_years <- national_parks_data %>%
+  select(YearRaw, Parkname)
+
+# Count the number of parks established per year
+parks_established_per_year <- park_years %>%
+  group_by(YearRaw) %>%
+  summarise(parks_count = n_distinct(Parkname))
+
+library(stringr)
+
+# Extract the last two digits of each year
+parks_established_per_year$YearAbbrev <- str_sub(parks_established_per_year$YearRaw, start = -2)
+
+# Create a bar plot with abbreviated years on the x-axis labels
+ggplot(parks_established_per_year, aes(x = as.factor(YearRaw), y = parks_count)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Yearly Trends in Park Establishment", x = "Year", y = "Number of Parks Established") +
+  scale_x_discrete(labels = parks_established_per_year$YearAbbrev) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6))
+```
+
