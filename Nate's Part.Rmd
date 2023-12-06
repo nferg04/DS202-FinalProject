@@ -15,12 +15,13 @@ library(dplyr)
 ```{r}
 file_path <- "All National Parks Visitation 1904-2016.csv"
 national_parks_data <- read.csv(file_path)
-head(national_parks_data)
 ```
 ```{r}
 
-ggplot(national_parks_data, aes(x = Year, fill = Unit.Type)) +
-  geom_bar()
+ggplot(national_parks_data, aes(x = YearRaw, fill = Unit.Type)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+
 ```
 ```{r}
 firstYear <- national_parks_data %>%
@@ -28,23 +29,40 @@ firstYear <- national_parks_data %>%
   group_by(Unit.Name) %>%
   filter(Year == min(Year))
 
-#firstYear$Visitors <- factor(firstYear$Visitors)
-
 ggplot(firstYear, aes(y = Visitors, x = YearRaw)) +
-  geom_point()
-
+  geom_point() +
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
 ```
 ```{r}
 ParksCreatedPerYear <- firstYear %>%
   group_by(YearRaw) %>%
   summarise(Unique_Parks = n_distinct(Parkname))
 
-print(ParksCreatedPerYear)
+ParksCreatedPerYear
 
-max_year <- ParksCreatedPerYear[which.max(ParksCreatedPerYear$Unique_Parks), ]
 ```
 
 ```{r}
-cat("The year with the most National Parks first visitor counts is", max_year$YearRaw, ".")
+totalVisitation <- national_parks_data %>%
+  group_by(Unit.Type, Unit.Name) %>%
+  summarize(totalVisitationPerPlace = sum(Visitors))
+
+ggplot(totalVisitation, aes(y = totalVisitationPerPlace, fill = Unit.Type)) +
+  geom_boxplot() +
+  coord_cartesian(xlim= c(-0.4,0.4))
 ```
 
+```{r}
+statisticalView <- national_parks_data %>%
+  group_by(Unit.Type) %>%
+  summarise(visitorMean = mean(Visitors, na.rm = TRUE),
+            visitorSD = sd(Visitors, na.rm = TRUE))
+ggplot(statisticalView, aes(x = visitorMean, y = visitorSD)) +
+  geom_point()
+
+```
+```{r}
+
+summary(statisticalView)
+
+```

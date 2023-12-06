@@ -1,0 +1,7 @@
+---
+title: "Final Report"
+author: "Nate Ferguson, Sam McTeague, Evan Sivets, Steven Tran"
+date: "2023-12-02"
+output: html_document
+---
+
