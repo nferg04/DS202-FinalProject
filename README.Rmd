@@ -18,7 +18,7 @@ For our project we used a data set titled "US National Parks Visitation 1904-201
 
 The data set contains many variables, but the key variables are Year, Unit Name, Unit Type, Geometry, Region, State, and Visitors. Year marks the year of the specific row of data. Unit Name is the name of the unit in each row. Unit Type specifies the type of park, such as National Park, National Monument, National Military Park, etc. Geometry notes the geometry of the park, with the options being polygon or multipolygon. Region states the region that each park is located in, and there are eight different regions. State notes which US state each speciifc park is located in. Visitors records how many people visited each specific park in the given year. 
 
-We read in and cleaned our data set using the code below. This code removed blank values from our data set.
+We read in and cleaned our data set using the code below. This code removed blank values from our data set. This step removed 4 rows of data, and left us with 21,556 observations and 18 variables.
 ```{r}
 library(tidyverse)
 file_path <- "All National Parks Visitation 1904-2016.csv"
