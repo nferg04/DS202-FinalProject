@@ -1,0 +1,64 @@
+---
+title: "Steven's-Part"
+author: "Steven Tran"
+date: "2023-12-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+file_path <- "All National Parks Visitation 1904-2016.csv"
+national_parks_data <- read.csv(file_path)
+```
+
+```{r}
+total_visit_by_year <- national_parks_data %>%
+  filter(YearRaw != "Total") %>%
+  group_by(Year = as.numeric(YearRaw)) %>%
+  summarize(TotalVisitors = sum(Visitors), NumberOfParks = n(), AverageVisitorPerPark = mean(Visitors))
+
+ggplot(total_visit_by_year, aes(x=factor(Year), y = TotalVisitors)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1)) +
+  labs(title = "Total Visitors to National Parks (1904-2016)", x = "Year", y="Total Visitors")
+
+ggplot(total_visit_by_year,aes(x=factor(Year), y = AverageVisitorPerPark)) +
+  geom_bar(stat = "identity", fill = "darkblue") +
+  theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1)) +
+  labs(title = "Average Visitors per Park by Year", x = "Year", y="Average Visitors per Park")
+  
+```
+
+
+
+```{r}
+total_visit_by_year$Year[which.max(total_visit_by_year$TotalVisitors)]
+total_visit_by_year$Year[which.min(total_visit_by_year$TotalVisitors)]
+```
+
+```{r}
+ggplot(national_parks_data, aes(x = YearRaw, fill = Geometry)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(size = 5,angle=90, hjust=1))
+```
+
+```{r}
+visitors_by_geometry <- national_parks_data %>%
+  group_by(Geometry) %>%
+  summarize(TotalVisitors = sum(Visitors, na.rm = TRUE), TotalParks = n())
+
+ggplot(visitors_by_geometry, aes(x= Geometry, y = TotalParks, fill = Geometry)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Parks by Geometry", x = "Geometry", y = "Number of National Parks")
+```
+```{r}
+ggplot(visitors_by_geometry, aes(x = Geometry, y = TotalVisitors, fill = Geometry)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Visitors by Geometry", x = "Geometry", y = "Visitors")
+```
