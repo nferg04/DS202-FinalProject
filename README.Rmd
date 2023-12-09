@@ -8,15 +8,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#Final Report - Team National Parks
+# 1. Final Report - Team National Parks
 
-##Introduction 
+# 2. Introduction 
 For our research project, we decided to analyze data on United States National Parks. As a group, our main goal was to discover how certain variables relate to and affect the visitation of national parks. We performed a variety of analysis on the variables in our data set to investigate this goal, used an array of methods and tests to generate outputs and visualizations that are related to our research goal, and were able to make important conclusions based on these techniques. Everything mentioned above will be discussed throughout this report.
 
-#Data 
+# 3. Data 
 For our project we used a data set titled "US National Parks Visitation 1904-2016." The data set comes from data.world.com (https://data.world/inform8n/us-national-parks-visitation-1904-2016-with-boundaries/workspace/file?filename=All+National+Parks+Visitation+1904-2016.csv) and it is a real world data set. This data set tracks real data on National Parks in the United States of America from the years 1904-2016. The set contains 21,560 observations and 18 variables. 
 
-The data set contains many variables, but the key variables are Year, Unit Name, Unit Type, Geometry, Region, State, and Visitors. Year marks the year of the specific row of data. Unit Name is the name of the unit in each row. Unit Type specifies the type of park, such as National Park, National Monument, National Military Park, etc. Geometry notes the geometry of the park, with the options being polygon or multipolygon. Region states the region that each park is located in, and there are eight different regions. State notes which US state each speciifc park is located in. Visitors records how many people visited each specific park in the given year. 
+The data set contains many variables, but the key variables are Year, Unit Name, Unit Type, Geometry, Region, State, and Visitors. Year marks the year of the specific row of data. Unit Name is the name of the unit in each row. Unit Type specifies the type of park, such as National Park, National Monument, National Military Park, Parkway, etc. Geometry notes the geometry of the park, with the options being polygon or multipolygon. Region states the region that each park is located in, and there are eight different regions. State notes which US state each speciifc park is located in. Visitors records how many people visited each specific park in the given year. 
 
 We read in and cleaned our data set using the code below. This code removed blank values from our data set. This step removed 4 rows of data, and left us with 21,556 observations and 18 variables.
 ```{r}
@@ -29,11 +29,78 @@ cleaned_data <- na.omit(national_parks_data)
 head(cleaned_data)
 ```
 
-####Methods 
+# 4. Data Analysis
+# 4.1 Visitors and Region
+**The Region Variable:**
+The first variable that was analyzed was the Region variable. The region variable is a character variable, and as previously mentioned it has eight levels. These levels can be seen using the following code:
+```{r}
+unique_regions <- unique(cleaned_data$Region)
+print(unique_regions)
+```
+The eight unique regions in this data set are AK, IM, MW, NC, NE, NT, PW, and SE. AK is the Alaskan Region. IM is the Intermountain Region. MW is the Midwest region. NC is the National Capital region. NE is the Northeast region. NT represents a small region in northern North Carolina. PW is the Pacific West region. And finally, SE is the Southeast region. 
 
+**ANOVA Test for Region and Visitors:**
+The next step of analysis was to determine if Region has an impact on Visitor numbers. In order to do this, an ANOVA test for significant difference in visitors between region was performed. The goal of this was to determine whether or not number of Visitors was significantly different for the eight different regions. If the test shows strong evidence of significant differences, then further analysis between the Region and Visitors variables would be useful. 
 
-#####Results 
+The ANOVA test;
+```{r}
+anova_model <- aov(Visitors ~ Region, data = cleaned_data)
+summary(anova_model)
+```
+Above is the result of the ANOVA test. As can be seen, the test resulted in an extremely small p-value of <2e^-16. This gives overwhelming evidence that there are significant differences in visitors between regions. The result of this test allows us to move into further analysis between these variables.
 
+**Total Visitors by Region**
+The next step was to analyze visitors by region. Using GGPlot, a bar chart of total visitors from 1904-2016 by region was created. 
+```{r}
+ggplot(cleaned_data, aes(x = Region, y = Visitors, fill = Region)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Visitation across Regions",
+       x = "Region",
+       y = "Visitation",
+       fill = "Region")
+```
+This bar chart clearly shows that the Northeast and Pacific West regions attracted the most total visitors from 1904-2016, and that the Southeast and Intermountain regions were not too far behind. This information was helpful, but our group was still skeptical about whether or not the number of parks in these regions was skewing total visitation numbers.
 
-######Conclusion
+**Parks per Regions Effect on Visitation:**
+Because of our skepticism, we wanted to analyze the relationship between parks per region and visitation. First, a subset of data was created that displays region, number of unique parks per region, and total visitation in each region. The code for creating this subset is shown below.
+```{r}
+parks_and_visitation_per_region <- cleaned_data %>%
+  group_by(Region) %>%
+  summarise(NumParks = n_distinct(Parkname), TotalVisitation = sum(Visitors))
+
+print(parks_and_visitation_per_region)
+```
+The total visitation numbers in this subset align with the total visitation numbers in the bar chart displayed earlier, so we know this subset is accurate. 
+
+This tables shows that, for the most part, the regions with the most total visitation also had a larger number of national sights. This makes sense logically, as more parks leads to more opportunity for visitors. In fact, according to NPS (National Park Services), it is very common for tourists to visit multiple national sights on the same trip. 
+
+Because of this finding, our group wanted to find which regions had the highest total visitation per park. This would tell us which regions were the most efficient at bringing in visitors based on the number of parks in each given region. To do this, we used dplyr to create another subset of data that divides total visitation per region by number of parks per region. The code for this output is given below: 
+```{r}
+average_attendance_per_park <- parks_and_visitation_per_region %>%
+  group_by(Region, NumParks) %>%
+  summarise(AvgAttendance = mean(TotalVisitation)) %>%
+  group_by(Region) %>%
+  summarise(AvgAttendancePerPark = AvgAttendance/NumParks)
+
+print(average_attendance_per_park)
+```
+This subset shows that the NT region, which only has one park, has the highest visitation per park of all the regions in the United States. It also shows that the Alaskan Region had the lowest. This supports our skepticism that parks per region had an effect on total visitation.
+
+In order to make sure these results were significant, another ANOVA test was completed. This tested whether or not the number of parks per region has a significant effect on total visitation. The code and output for this test can be seen here:
+```{r}
+anova_model2 <- lm(TotalVisitation ~ NumParks, data = parks_and_visitation_per_region)
+
+anova_result <- anova(anova_model2)
+
+print(anova_result)
+```
+The results of this test give a p-value of 0.0575. Although this p-value is not overwhelming, it still gives strong evidence that number of parks per region has an effect on total visitation. This allows us to conclude that our previous analysis between these variables is significant.
+
+# 4.2 (Next Variable Analyzed Here)
+
+# 5. Results 
+# 5.1 Region and Visitors Results
+The relationship between Region and Visitors was analyzed using a variety of methods such as tidyverse, ggplot, dplyr, and anova. Through much trial and error, our group was able to conclude that region undoubtedly has an impact on visitation numbers using an anova test. The Northeast and Pacific West regions had the most total visitors from 1904-2016. However, the inkling that number of parks per region had an effect on these total visitation numbers was true, and tested using anova. With this information we were able to use dplyr to discover that the NT region had the highest visitors per park, and that the Alaskan region had the lowest.
+
+# 6. Conclusion
 
