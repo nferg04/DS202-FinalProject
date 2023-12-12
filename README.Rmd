@@ -141,7 +141,7 @@ statisticalView <- national_parks_data %>%
   group_by(Unit.Type) %>%
   summarise(visitorMean = mean(Visitors, na.rm = TRUE),
             visitorSD = sd(Visitors, na.rm = TRUE))
-summary(statiscalView)
+summary(statisticalView)
 ```
 Looking at this summary there doesn't seem to be that much of a difference in the mean vistor count based on unit type. Some of this is because most unit types get similar visitation rates. However I think that the more interesting part is the breakdown of standard deviation. Looking at the full list there are some unit types where the visitation numbers are very packed together. For these it is hard to tell what the reason is but one factor in it is almost certainly it's unit type. This summary and the previous graph were able to help us make conclusions on how unit type is able to affect visitor counts.
 
@@ -186,6 +186,52 @@ ggplot(park_type_counts, aes(x = Region, y = count, fill = Unit.Type)) +
 ```
 In this graph, it splits up the regions on the x axis and the amount of parks on the y axis.On the right side of the graph there is a key for each type of park representing a different color. This was to help show which states parks are more common in different regions. With this it was helpful in seeing which type of parks are more visited than others based on what we knew from total visitors of states and regions.
 
+# 4.4 Year
+The next variable we analyzed was year and how the years affected visitation numbers. To do this, we grouped the dataset by the year and filtered out any "Total" results. We assigned 4 variables: Year contains every year from 1904 to 2016, TotalVisitors contains the total number of visitors for the cooresponding year, NumberOfParks contains the total number of parks for the year, and the AverageVisitorPerPark contains the average number of visitors for every park. The following code does this.
+```{r}
+year_visitors <- national_parks_data %>%
+  filter(YearRaw != "Total") %>%
+  group_by(Year = as.numeric(YearRaw)) %>%
+  summarize(TotalVisitors = sum(Visitors), NumberOfParks = n(), AverageVisitorPerPark = mean(Visitors))
+```
+Next we wanted to see how many total visitors there were every year. To improve readability, we decided to show data only every 5 years.
+```{r}
+ggplot(year_visitors, aes(x=factor(Year), y = TotalVisitors)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1)) +
+  scale_x_discrete(breaks=seq(1904,2016, by = 5)) +
+  labs(title = "Total Visitors to National Parks (1904-2016)", x = "Year", y="Total Visitors")
+```
+The trend that the graph shows is that visitation increases at a fast pace until around around 1990 when it starts to plateau. There were no apparent reason for why national parks visitation starts to plateau. Additionally, there is a small drop around 1940 which was eye catching. As stated previously, the dip was most likely caused by WWII. 
+```{r}
+ggplot(year_visitors,aes(x=factor(Year), y = AverageVisitorPerPark)) +
+  geom_bar(stat = "identity", fill = "darkblue") +
+  theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1)) +
+  scale_x_discrete(breaks=seq(1904,2016, by = 5)) +
+  labs(title = "Average Visitors per Park by Year", x = "Year", y="Average Visitors per Park")
+```
+We also wanted to check to see if the increasing number of parks was why the visitation rates went up, so the graph above shows the average number of visitors every year. There doesn't appear to be any big differences between the two graphs.
+
+# 4.5 Geometry
+The final variable we analyzed was Geometry. The geometry of a national park could be either POLYGON or MULTIPOLYGON. Polygon means that the park has one physical continuous spot on the map, while multipolygon means that there are multiple areas of the park. The following code will get the total visitor counts from all the multipolygon and polygon parks and create a bar chart showing the counts of each.
+```{r}
+park_geometry <- national_parks_data %>%
+  group_by(Geometry) %>%
+  summarize(TotalVisitors = sum(Visitors, na.rm = TRUE), TotalParks = n())
+
+ggplot(park_geometry, aes(x= Geometry, y = TotalParks, fill = Geometry)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Parks by Geometry", x = "Geometry", y = "Number of National Parks")
+```
+The above graph show that there are 11455 multipolygon parks and 10105 polygon parks.That means that there are only 1350 more multipolygon parks than polygon parks. So, there are 13% multipolygon parks than polygon parks. We could not find any information for why there are more multipolygon parks, but my best assumption is that parks may grow or shrink over time, which means that they may gain new territory or have to split their existing land into multiple sections.
+
+Next, we wanted to see whether or not the geometry of a park affected its visitation numbers. To do this, we ran the following code to create a bar chart for the total visitation numbers for multipolygon and polygon
+```{r}
+ggplot(park_geometry, aes(x = Geometry, y = TotalVisitors, fill = Geometry))+
+  geom_bar(stat = "identity") +
+  labs(title = "Total Visitors by Geometry", x = "Geometry", y = "Visitors")
+```
+The above graph shows that multipolygon parks gain a lot more visitors than polygon parks. Multipolygon parks had about 18.29 million total visiors while polygon parks only had 9.24 million. Multipolygon parks had 9.05 million more total visitors, which means that they had 97.9% more visitors than polygon parks. Even though there were only 13% more multipolygon parks, there is a much larger increase in visitor counts to multipolygon parks. One explanation for this is that multipolygon states have multiple areas for visitors to visit, which encourages revisitations. Another explanation as to why it has such a high increase is that multipolygon parks can cover a larger area of land, which makes more people have access to the park. 
 
 # 5. Results 
 # 5.1 Region and Visitors Results
@@ -196,6 +242,12 @@ The effect that Unit type has on visitors was thoroughly looked at using many of
 
 # 5.3 States and Parks Results
 The results of these two were to help build off of the unit types and region and visitors results. We concluded that the national parks most visited tended to be national parks, parkways or historical sites. This is also do to the fact that people would like to go to more than one thing if they were to go travel to somewhere. Most of the those three main national parks have other national parks neighboring it, ether of the same type of park of one relatively close to it. This is why you see California, DC and North Carolina all with high total visitors, as they all have a high amount of parks in them all close to one another.
+
+# 5.4 Year Results
+The relationship between the total visition and the year was analyzed through many of the same methods as the Region variable. After reviewing the results, we can conclude that the year definitely has a big impact on the total visitation. As the years progressed from 1904 to 1990, there was a huge increase in total visitations. We also tested to see whether the number of national parks was a big contributing factor by analyzing the average number of visitors per park, but the results did not seem to differ. However from 1990 to 2016, there seemed to be a plateau in the total number of visitors, which could be caused by a number of reasons.
+
+# 5.5 Geometry results
+The impact that the Geometry of a national park has on its visitation was tested in many of the same methods mentioned prior. After reviewing the results, we can confidently say that the geometry of a national park definitely affects its visitation rate. We saw that there were only 13% more parks with multipolygon geometry compared to polygon's, but had nearly 98% more visitors than polygon parks did. This could be caused by many reasons, such as multipolygon park offering better revisitation options and larger coverage.
 
 # 6. Conclusion
 
