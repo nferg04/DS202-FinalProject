@@ -96,11 +96,62 @@ print(anova_result)
 ```
 The results of this test give a p-value of 0.0575. Although this p-value is not overwhelming, it still gives strong evidence that number of parks per region has an effect on total visitation. This allows us to conclude that our previous analysis between these variables is significant.
 
-# 4.2 (Next Variable Analyzed Here)
+# 4.2 Unit Type
+The next variable we analyzed is the Unit Type. It is a character variable type and it contains the 30 classifications that the National Park Service uses. These 30 regions are can be seen using the code below:
+```{r}
+uniqueTypes <- unique(cleaned_data$Unit.Type)
+print(uniqueTypes)
+
+```
+We will give a slight breakdown on all of the types focusing in on the more significant ones. Starting with the National Park Type. The National Parks are the places that you think of when you hear about the NPS. These are the places that protect unique wildlife and or geological marvels. While there are only around 60 of them they make up the large majority of the visitor count. A few of the other ones we will look at are the National Monuments, National Lakeshores and the Other Designation. The National Monuments are generally places that have a great historical value and represent important moments in our history. National Lakeshores protect the coastline of lakes and other inland bodies of water. The other designation type contains a few places in and around Washington D.C that don't fit well in other categories.
+
+The next thing that our group looked at was when all of these places were first designated with their unit type. To do this we used the code shown below to create a bar graph:
+```{r}
+national_parks_data$YearRaw = as.numeric(national_parks_data$YearRaw)
+ggplot(national_parks_data, aes(x = YearRaw, fill = Unit.Type)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle=45, vjust=0.5, hjust=1)) +
+  scale_x_continuous(breaks = seq(1904,2016,20))
+```
+This shows that most of the first entries were national parks. It stays this way until around the 1930's when we start to se an increase in other types. There is a slight dip in total count during WW2 and the years following that. However it starts to pick up again and we see a steady increase in nearly all types up until 2016. There are a few types that start to plateau in the late 1900's. We mainly see this in types like the Wild and Scenic River, Scenic and Recreational River, and the National Seashore. There could be a number of factors in this but one could be that there is a higher emphasis on using other types as we see the National River and Recreation Area type explode during the same time frame. 
+
+After looking at the breakdown of unit types over time we decided to see how unit type affected total visitor count. To do this we made a boxblot of total visitor count using the code seen here:
+```{r}
+totalVisitation <- national_parks_data %>%
+  group_by(Unit.Type, Unit.Name) %>%
+  summarize(totalVisitationPerPlace = sum(Visitors))
+
+limitedTotalVisitation <- totalVisitation %>%
+ filter(Unit.Type %in% c("National Park", "Other Designation", "National Lakeshore", "National Monument"))
+
+ggplot(limitedTotalVisitation, aes(y = totalVisitationPerPlace, fill = Unit.Type)) +
+  geom_boxplot() +
+  coord_cartesian(xlim= c(-0.3,0.3)) +
+  scale_x_discrete()
+
+```
+  This graph shows the 5 main types we will focus on in this discussion. If you look at the National Park box-plot you will see that it has an anomaly up at the top of the graph. This is Smokey Mountain National Park. It is consistently in the top 3 most visited parks every year. Looking at the rest of the park box-plot you can see that it has an average total visitor count that is by far higher than any other except the national Lakeshore. While it may seem a little weird at first upon a closer look a good chunk of this is due to the fact that a large amount of the Parks that are further away have very low visitor counts. This includes places like Alaska, Hawaii, and American Samoa where large chunks of their parks are in the bottom quartile of visitor count. 
+  Moving next to the national Monument you can see that it has a fair few outliers. The top one is the Statue of Liberty. Then in the group lower towards the box-plot we have monuments like the WW2 valor monument, Cabrillo, and the Fort McHenry Monument. The national monuments anomalies definitely add a lot of the visitor count to their unit type. 
+  The final type on the graph is the Other Designation type. I just wanted to quickly point out that the anomaly there is the White House. It has nearly the same amount of total visitors as the rest of its type combined.
+  While there are a lot of outliers on this graph you can see how visitor count is starting to correlate to the unit type.
+  
+The final thing we wanted to look at is the average visitor count and standard deviation based on unit type. This is can be shown using the following code:
+```{r}
+statisticalView <- national_parks_data %>%
+  group_by(Unit.Type) %>%
+  summarise(visitorMean = mean(Visitors, na.rm = TRUE),
+            visitorSD = sd(Visitors, na.rm = TRUE))
+summary(statiscalView)
+```
+Looking at this summary there doesn't seem to be that much of a difference in the mean vistor count based on unit type. Some of this is because most unit types get similar visitation rates. However I think that the more interesting part is the breakdown of standard deviation. Looking at the full list there are some unit types where the visitation numbers are very packed together. For these it is hard to tell what the reason is but one factor in it is almost certainly it's unit type. This summary and the previous graph were able to help us make conclusions on how unit type is able to affect visitor counts.
+
 
 # 5. Results 
 # 5.1 Region and Visitors Results
 The relationship between Region and Visitors was analyzed using a variety of methods such as tidyverse, ggplot, dplyr, and anova. Through much trial and error, our group was able to conclude that region undoubtedly has an impact on visitation numbers using an anova test. The Northeast and Pacific West regions had the most total visitors from 1904-2016. However, the inkling that number of parks per region had an effect on these total visitation numbers was true, and tested using anova. With this information we were able to use dplyr to discover that the NT region had the highest visitors per park, and that the Alaskan region had the lowest.
+
+# 5.2 Unit Type Results
+The effect that Unit type has on visitors was thoroughly looked at using many of the same methods as the Region variable. After many tests we can conclude that unit type has some impact on visitor count. While we believe there is an impact based on Unit Type we believe it mostly shows in a comparison of National Parks compared to the rest of the Types. Most types don't see have enough visitors to make strong statements on how they affect visitation. However it is very clear when looking at the total visitation that if the locations unit type is a national park it will have a higher visitation. Even when it is on the low end of the type's visitation.
 
 # 6. Conclusion
 
