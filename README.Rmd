@@ -145,6 +145,9 @@ summary(statiscalView)
 ```
 Looking at this summary there doesn't seem to be that much of a difference in the mean vistor count based on unit type. Some of this is because most unit types get similar visitation rates. However I think that the more interesting part is the breakdown of standard deviation. Looking at the full list there are some unit types where the visitation numbers are very packed together. For these it is hard to tell what the reason is but one factor in it is almost certainly it's unit type. This summary and the previous graph were able to help us make conclusions on how unit type is able to affect visitor counts.
 
+#4.3 States and Parks
+What was decided to do with the states whas to find the total visitors by state to help expand on the total visiotrs by state.
+
 
 # 5. Results 
 # 5.1 Region and Visitors Results
