@@ -194,5 +194,8 @@ The relationship between Region and Visitors was analyzed using a variety of met
 # 5.2 Unit Type Results
 The effect that Unit type has on visitors was thoroughly looked at using many of the same methods as the Region variable. After many tests we can conclude that unit type has some impact on visitor count. While we believe there is an impact based on Unit Type we believe it mostly shows in a comparison of National Parks compared to the rest of the Types. Most types don't see have enough visitors to make strong statements on how they affect visitation. However it is very clear when looking at the total visitation that if the locations unit type is a national park it will have a higher visitation. Even when it is on the low end of the type's visitation.
 
+# 5.3 States and Parks Results
+The results of these two were to help build off of the unit types and region and visitors results. We concluded that the national parks most visited tended to be national parks, parkways or historical sites. This is also do to the fact that people would like to go to more than one thing if they were to go travel to somewhere. Most of the those three main national parks have other national parks neighboring it, ether of the same type of park of one relatively close to it. This is why you see California, DC and North Carolina all with high total visitors, as they all have a high amount of parks in them all close to one another.
+
 # 6. Conclusion
 
