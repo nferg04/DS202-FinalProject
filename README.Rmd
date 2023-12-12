@@ -146,7 +146,45 @@ summary(statiscalView)
 Looking at this summary there doesn't seem to be that much of a difference in the mean vistor count based on unit type. Some of this is because most unit types get similar visitation rates. However I think that the more interesting part is the breakdown of standard deviation. Looking at the full list there are some unit types where the visitation numbers are very packed together. For these it is hard to tell what the reason is but one factor in it is almost certainly it's unit type. This summary and the previous graph were able to help us make conclusions on how unit type is able to affect visitor counts.
 
 # 4.3 States and Parks
-What was decided to do with the states whas to find the total visitors by state to help expand on the total visiotrs by state.
+What was decided to do with the states was to find the total visitors by state to help expand on the total visitors by state.To do this I ran the code as 
+
+```{r}
+#Summing up visitors by state
+visitors_by_state <- national_parks_data %>%
+  group_by(State) %>%
+  summarise(total_visitors = sum(Visitors))
+
+#Bar plot for visitors by state
+ggplot(visitors_by_state, aes(x = State, y = total_visitors)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Total Visitors by State", x = "State", y = "Total Visitors") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip()  # Flip the axes for better readability
+```
+
+This was able to get the total of visitors per state and show you on a bar graph. The main focus of this was after showing the amount of total visitors per region, you would be able to see how it was broken down per state. As shown in the graph the three most visited states were in order, California, North Carolina and D.C. which are all apart of different regions. Each of the regions they are in line up with being the most visited regions.
+
+The other topic that was looked at was Park Type Distribution per region.This was to help show which regions have which types of parks and if that good be influential to why they have a higher rate of people going to those regions.
+
+```{r}
+#Park Type comparisons
+# Filter the necessary columns for park types and regions
+park_types <- national_parks_data %>%
+  select(Region, Unit.Type)
+
+# Count the occurrences of each park type within each region
+park_type_counts <- park_types %>%
+  group_by(Region, Unit.Type) %>%
+  summarise(count = n())
+
+# Create a bar plot for park type distribution across regions
+ggplot(park_type_counts, aes(x = Region, y = count, fill = Unit.Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Park Type Distribution Across Regions", x = "Region", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1))
+```
+In this graph, it splits up the regions on the x axis and the amount of parks on the y axis.On the right side of the graph there is a key for each type of park representing a different color. This was to help show which states parks are more common in different regions. With this it was helpful in seeing which type of parks are more visited than others based on what we knew from total visitors of states and regions.
 
 
 # 5. Results 
