@@ -250,4 +250,4 @@ The relationship between the total visition and the year was analyzed through ma
 The impact that the Geometry of a national park has on its visitation was tested in many of the same methods mentioned prior. After reviewing the results, we can confidently say that the geometry of a national park definitely affects its visitation rate. We saw that there were only 13% more parks with multipolygon geometry compared to polygon's, but had nearly 98% more visitors than polygon parks did. This could be caused by many reasons, such as multipolygon park offering better revisitation options and larger coverage.
 
 # 6. Conclusion
-
+In conclusion, our group performed extensive analysis on a real world data set that tracked National Park visitation in the United States from 1904-2016. Our main variable of interest was the visitors variable which tracked the number of visitors at each park each year. We were able to perfom analysis on a variety of possible explanatory variables such as Year, Unit Type, State, and Region in order to come to the conclusions previously stated.
